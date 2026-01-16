@@ -32,19 +32,35 @@ export default async function ProductPage({ params }: { params: { slug: string }
         .neq('id', productId)
         .limit(4);
 
-    const relatedProducts = relatedData?.map(p => ({
-        id: p.id,
-        name: p.name,
-        price: p.price,
-        originalPrice: p.original_price || undefined, // Use actual original_price from database
-        category: p.categories?.name || 'General',
-        image: p.images && p.images.length > 0 ? p.images[0] : null,
-        rating: 4.5,
-        reviews: 12,
-        weight: p.size,
-        outOfStock: p.stock <= 0 || p.season_over,
-        badge: p.season_over ? 'Season Over' : (p.is_featured ? 'Best Seller' : undefined)
-    })) || [];
+    // Fetch stats for related products
+    const relatedIds = relatedData?.map(p => p.id) || [];
+    let relatedStatsMap = new Map();
+
+    if (relatedIds.length > 0) {
+        const { data: relStats } = await supabase
+            .from('product_review_stats')
+            .select('*')
+            .in('product_id', relatedIds);
+
+        relatedStatsMap = new Map((relStats || []).map((s: any) => [s.product_id, s]));
+    }
+
+    const relatedProducts = relatedData?.map(p => {
+        const stats = relatedStatsMap.get(p.id) || { avg_rating: 0, review_count: 0 };
+        return {
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            originalPrice: p.original_price || undefined,
+            category: p.categories?.name || 'General',
+            image: p.images && p.images.length > 0 ? p.images[0] : null,
+            rating: Number(stats.avg_rating) || 0,
+            reviews: Number(stats.review_count) || 0,
+            weight: p.size,
+            outOfStock: p.stock <= 0 || p.season_over,
+            badge: p.season_over ? 'Season Over' : (p.is_featured ? 'Best Seller' : undefined)
+        };
+    }) || [];
 
     // Determine stock status
     const isSeasonOver = product.season_over;
@@ -57,6 +73,17 @@ export default async function ProductPage({ params }: { params: { slug: string }
         badgeLabel = 'Sold Out';
     }
 
+    // Fetch review stats
+    const { data: reviewStats } = await supabase
+        .from('product_review_stats')
+        .select('*')
+        .eq('product_id', productId)
+        .single();
+
+    // Default values if no stats found
+    const avgRating = reviewStats?.avg_rating || 0;
+    const reviewCount = reviewStats?.review_count || 0;
+
     // Map to props expected by components
     const displayProduct = {
         id: product.id,
@@ -65,8 +92,8 @@ export default async function ProductPage({ params }: { params: { slug: string }
         category: product.categories?.name || 'General',
         image: product.images && product.images.length > 0 ? product.images[0] : null,
         description: product.description || 'Authentic product from Salem Farm.',
-        rating: 4.8,
-        reviews: 50,
+        rating: Number(avgRating),
+        reviews: Number(reviewCount),
         features: product.is_seasonal ? ['Seasonal Special', 'Farm Fresh'] : ['Available All Year', 'Premium Quality'],
         outOfStock: isOutOfStock,
         badgeLabel: badgeLabel
@@ -110,7 +137,16 @@ export default async function ProductPage({ params }: { params: { slug: string }
                     <h1 style={{ marginBottom: '1rem', fontSize: '2.5rem', lineHeight: '1.2' }}>{displayProduct.name}</h1>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                        <div style={{ display: 'flex', color: '#fbbf24' }}><Star fill="#fbbf24" size={20} /> <Star fill="#fbbf24" size={20} /> <Star fill="#fbbf24" size={20} /> <Star fill="#fbbf24" size={20} /> <Star fill="#fbbf24" size={20} /></div>
+                        <div style={{ display: 'flex', color: '#fbbf24' }}>
+                            {[...Array(5)].map((_, i) => (
+                                <Star
+                                    key={i}
+                                    size={20}
+                                    fill={i < Math.round(displayProduct.rating) ? '#fbbf24' : 'none'}
+                                    stroke={i < Math.round(displayProduct.rating) ? '#fbbf24' : '#d1d5db'}
+                                />
+                            ))}
+                        </div>
                         <span style={{ color: '#6b7280' }}>({displayProduct.reviews} reviews)</span>
                     </div>
 

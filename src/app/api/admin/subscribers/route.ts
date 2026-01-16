@@ -25,13 +25,28 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { data, error } = await supabaseAdmin
+        const { searchParams } = new URL(request.url);
+        const page = parseInt(searchParams.get('page') || '1');
+        const limit = parseInt(searchParams.get('limit') || '10');
+        const offset = (page - 1) * limit;
+
+        const { data, error, count } = await supabaseAdmin
             .from('newsletter_subscribers')
-            .select('*')
-            .order('subscribed_at', { ascending: false });
+            .select('*', { count: 'exact' })
+            .order('subscribed_at', { ascending: false })
+            .range(offset, offset + limit - 1);
 
         if (error) throw error;
-        return NextResponse.json(data);
+
+        return NextResponse.json({
+            subscribers: data,
+            pagination: {
+                total: count,
+                page,
+                limit,
+                totalPages: Math.ceil((count || 0) / limit)
+            }
+        });
 
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });

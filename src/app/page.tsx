@@ -7,23 +7,35 @@ import { HeroCarousel } from '@/components/home/HeroCarousel';
 import { ProductGrid } from '@/components/home/ProductGrid';
 
 // Helper to map DB to UI
-const mapProduct = (p: any): ProductCardProps => ({
-    id: p.id,
-    name: p.name,
-    price: p.price,
-    originalPrice: p.original_price || undefined, // Use actual original_price from database
-    category: p.categories?.name || 'General',
-    image: p.images && p.images.length > 0 ? p.images[0] : null,
-    weight: p.size || '1kg',
-    rating: 4.8,
-    reviews: 50 + p.id * 2,
-    badge: p.is_featured ? 'Best Seller' : (p.id % 2 === 0 ? 'Fresh' : 'Organic'),
-    badgeColor: p.is_featured ? '#ef4444' : '#10b981'
-});
+const mapProduct = (p: any, statsMap: Map<number, any>): ProductCardProps => {
+    const stats = statsMap.get(p.id) || { avg_rating: 0, review_count: 0 };
+    return {
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        originalPrice: p.original_price || undefined,
+        category: p.categories?.name || 'General',
+        image: p.images && p.images.length > 0 ? p.images[0] : null,
+        weight: p.size || '1kg',
+        rating: Number(stats.avg_rating) || 0,
+        reviews: Number(stats.review_count) || 0,
+        badge: p.is_featured ? 'Best Seller' : (p.id % 2 === 0 ? 'Fresh' : 'Organic'),
+        badgeColor: p.is_featured ? '#ef4444' : '#10b981'
+    };
+};
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
+    // Fetch review stats
+    const { data: reviewStats } = await supabase
+        .from('product_review_stats')
+        .select('*');
+
+    const statsMap = new Map(
+        (reviewStats || []).map((s: any) => [s.product_id, s])
+    );
+
     // Fetch Featured Products (available only)
     let { data: dbFeatured } = await supabase
         .from('products')
@@ -45,7 +57,7 @@ export default async function Home() {
         dbFeatured = fallback;
     }
 
-    const featuredProducts = dbFeatured ? dbFeatured.map(mapProduct) : [];
+    const featuredProducts = dbFeatured ? dbFeatured.map(p => mapProduct(p, statsMap)) : [];
 
     // Fresh Arrivals (available only) - Fetch 8 for initial load
     const { data: dbRecent } = await supabase
@@ -56,7 +68,7 @@ export default async function Home() {
         .order('created_at', { ascending: false })
         .limit(8);
 
-    const recentProducts = dbRecent ? dbRecent.map(mapProduct) : [];
+    const recentProducts = dbRecent ? dbRecent.map(p => mapProduct(p, statsMap)) : [];
 
     // Fetch All Categories for Featured Categories section
     const { data: dbCategories } = await supabase

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import Script from 'next/script';
+import { EmailService } from '@/lib/EmailService';
 
 declare global {
     interface Window {
@@ -252,7 +253,7 @@ export default function CheckoutPage() {
                 order_id: orderData.id,
                 handler: async function (response: any) {
                     // Payment Success - Create Order in DB
-                    const { error } = await supabase.from('orders').insert([{
+                    const { data, error } = await supabase.from('orders').insert([{
                         user_id: user.id,
                         total_amount: total,
                         status: 'processing',
@@ -263,16 +264,50 @@ export default function CheckoutPage() {
                     }]).select().single();
 
                     if (error) {
-                        console.error('Error saving order:', error);
-                        alert('Payment successful but failed to save order. Please contact support.');
-                    } else {
-                        // Success!
-                        clearCart();
-                        setIsSuccess(true);
-                        setTimeout(() => {
-                            router.push('/account?tab=orders');
-                        }, 3000);
+                        console.error('Error saving order:', JSON.stringify(error, null, 2));
+                        alert(`Payment successful but failed to save order: ${error.message || error.code || JSON.stringify(error)}. Please contact support.`);
+                        return;
                     }
+
+                    // Insert order items
+                    const orderItems = items.map(item => ({
+                        order_id: data.id,
+                        product_id: item.id,
+                        quantity: item.quantity,
+                        price: item.price
+                    }));
+
+                    const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+                    if (itemsError) {
+                        console.error('Error saving order items:', JSON.stringify(itemsError, null, 2));
+                        // Order was created, just items failed - don't block success
+                    }
+
+                    // Success!
+                    // Send confirmation based on user's signup method
+                    const isPhoneUser = user.phone && !user.email?.includes('@');
+
+                    if (isPhoneUser) {
+                        // Send SMS for phone users
+                        const smsMessage = `Order Confirmed! Your order #${data.id} for Rs.${total} has been placed successfully. Thank you for shopping with Salem Farm Mango!`;
+                        fetch('/api/send-sms', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ phone: user.phone, message: smsMessage })
+                        }).catch(err => console.error('Failed to send SMS:', err));
+                    } else {
+                        // Send email for email users
+                        const orderForEmail = { ...data, user_email: user.email, shipping_address: shippingAddress };
+                        EmailService.sendOrderConfirmation(orderForEmail, items).catch(err => {
+                            console.error('Failed to send confirmation email:', err);
+                        });
+                    }
+
+                    clearCart();
+                    setIsSuccess(true);
+                    setTimeout(() => {
+                        router.push('/account?tab=orders');
+                    }, 3000);
                 },
                 prefill: {
                     name: shippingAddress.full_name,

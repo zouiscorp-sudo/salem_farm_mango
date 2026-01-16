@@ -8,7 +8,7 @@ import ShopClient from '@/components/shop/ShopClient';
 export const dynamic = 'force-dynamic';
 
 export default async function ShopPage() {
-    // 1. Fetch Products
+    // 1. Fetch Products with review stats
     const { data: dbProducts } = await supabase
         .from('products')
         .select(`
@@ -16,11 +16,24 @@ export default async function ShopPage() {
             categories (name, slug)
         `);
 
-    // 2. Transform Data
+    // 2. Fetch review stats
+    const { data: reviewStats } = await supabase
+        .from('product_review_stats')
+        .select('*');
+
+    // Create a map for quick lookup
+    const statsMap = new Map(
+        (reviewStats || []).map((s: any) => [s.product_id, s])
+    );
+
+    // 3. Transform Data
     let products: ProductCardProps[] = [];
 
     if (dbProducts) {
         products = dbProducts.map((p: any) => {
+            // Get review stats for this product
+            const stats = statsMap.get(p.id) || { avg_rating: 0, review_count: 0 };
+
             // Determine badge based on stock and season status
             let badge = undefined;
             let badgeColor = '#ef4444';
@@ -40,12 +53,12 @@ export default async function ShopPage() {
                 id: p.id,
                 name: p.name,
                 price: p.price,
-                originalPrice: p.original_price || undefined, // Use actual original_price from database
+                originalPrice: p.original_price || undefined,
                 category: p.categories?.name || 'Uncategorized',
                 image: p.images && p.images.length > 0 ? p.images[0] : null,
                 weight: p.size || '1kg',
-                rating: 4.8, // Default high rating for farm fresh appeal
-                reviews: p.stock > 0 ? 10 + p.stock : 5, // Mock review count based on interaction
+                rating: Number(stats.avg_rating) || 0,
+                reviews: Number(stats.review_count) || 0,
                 badge,
                 badgeColor,
                 outOfStock: p.stock === 0 || p.stock === null || p.season_over

@@ -12,33 +12,53 @@ export default function AdminDashboard() {
     });
     const [recentOrders, setRecentOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [dateFilter, setDateFilter] = useState(new Date().toISOString().split('T')[0]);
 
     useEffect(() => {
-        fetchDashboardData();
-    }, []);
+        fetchDashboardData(dateFilter);
+    }, [dateFilter]);
 
-    const fetchDashboardData = async () => {
+    const fetchDashboardData = async (date: string) => {
+        setLoading(true);
         try {
-            // Fetch total revenue and order count
-            const { data: orders } = await supabase
-                .from('orders')
-                .select('total_amount');
+            // Prepare date range
+            let startDateStr = '';
+            let endDateStr = '';
+
+            if (date) {
+                const startDate = new Date(date);
+                startDate.setHours(0, 0, 0, 0);
+                const endDate = new Date(date);
+                endDate.setHours(23, 59, 59, 999);
+
+                startDateStr = startDate.toISOString();
+                endDateStr = endDate.toISOString();
+            }
+
+            // Fetch total revenue and order count (Filtered by date)
+            let ordersQuery = supabase.from('orders').select('total_amount');
+            if (date) {
+                ordersQuery = ordersQuery.gte('created_at', startDateStr).lte('created_at', endDateStr);
+            }
+            const { data: orders } = await ordersQuery;
 
             const totalRevenue = orders?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0;
             const orderCount = orders?.length || 0;
 
-            // Fetch products count
+            // Fetch products count (Total, not filtered)
             const { count: productCount } = await supabase
                 .from('products')
                 .select('*', { count: 'exact', head: true });
 
-            // Fetch customers count
-            const { count: customerCount } = await supabase
-                .from('profiles')
-                .select('*', { count: 'exact', head: true });
+            // Fetch customers count (New customers filtered by date)
+            let customersQuery = supabase.from('profiles').select('*', { count: 'exact', head: true });
+            if (date) {
+                customersQuery = customersQuery.gte('created_at', startDateStr).lte('created_at', endDateStr);
+            }
+            const { count: customerCount } = await customersQuery;
 
-            // Fetch recent orders with user info
-            const { data: recentOrdersData } = await supabase
+            // Fetch recent orders with user info (Filtered by date)
+            let recentOrdersQuery = supabase
                 .from('orders')
                 .select(`
                     id,
@@ -50,7 +70,13 @@ export default function AdminDashboard() {
                     )
                 `)
                 .order('created_at', { ascending: false })
-                .limit(3);
+                .limit(10); // Increased limit for better visibility
+
+            if (date) {
+                recentOrdersQuery = recentOrdersQuery.gte('created_at', startDateStr).lte('created_at', endDateStr);
+            }
+
+            const { data: recentOrdersData } = await recentOrdersQuery;
 
             setStats({
                 revenue: totalRevenue,
@@ -83,7 +109,22 @@ export default function AdminDashboard() {
 
     return (
         <div>
-            <h1 style={{ marginBottom: 'var(--space-8)' }}>Dashboard Overview</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-8)' }}>
+                <h1>Dashboard Overview</h1>
+                <input
+                    type="date"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    style={{
+                        padding: '0.5rem',
+                        border: '1px solid var(--border-light)',
+                        borderRadius: 'var(--radius-md)',
+                        outline: 'none',
+                        color: 'var(--text-primary)',
+                        background: 'var(--bg-primary)'
+                    }}
+                />
+            </div>
 
             {/* Stats Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-8)', marginBottom: 'var(--space-12)' }}>

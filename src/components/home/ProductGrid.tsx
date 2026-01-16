@@ -25,8 +25,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ initialProducts }) => 
         category: p.categories?.name || 'General',
         image: p.images && p.images.length > 0 ? p.images[0] : null,
         weight: p.size || '1kg',
-        rating: 4.8,
-        reviews: 50 + p.id * 2,
+        rating: p.avg_rating || 0,
+        reviews: p.review_count || 0,
         badge: p.is_featured ? 'Best Seller' : (p.id % 2 === 0 ? 'Fresh' : 'Organic'),
         badgeColor: p.is_featured ? '#ef4444' : '#10b981'
     });

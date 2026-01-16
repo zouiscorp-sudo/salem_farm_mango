@@ -6,17 +6,27 @@ import { Button } from '@/components/ui/Button';
 export default function AdminSubscribersPage() {
     const [subscribers, setSubscribers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
         fetchSubscribers();
-    }, []);
+    }, [page]);
 
     const fetchSubscribers = async () => {
+        setLoading(true);
         try {
-            const res = await fetch('/api/admin/subscribers');
+            const res = await fetch(`/api/admin/subscribers?page=${page}&limit=10`);
             if (!res.ok) throw new Error('Failed to fetch subscribers');
             const data = await res.json();
-            setSubscribers(data || []);
+
+            // Handle both legacy array response and new paginated response
+            if (Array.isArray(data)) {
+                setSubscribers(data);
+            } else {
+                setSubscribers(data.subscribers || []);
+                setTotalPages(data.pagination?.totalPages || 1);
+            }
         } catch (error) {
             console.error('Error fetching subscribers:', error);
         } finally {
@@ -24,7 +34,12 @@ export default function AdminSubscribersPage() {
         }
     };
 
+    // ... exportToCSV unchanged ...
+
     const exportToCSV = () => {
+        // Export should ideally fetch ALL data, but for now we export current view or we need a new API endpoint for export
+        // Re-using current subscribers for simplicity as per existing logic, or better:
+        // Trigger a separate full download if needed. For now keeping existing logic on current loaded data.
         const headers = ['Email', 'Subscribed At'];
         const csvData = subscribers.map(sub => [
             sub.email,
@@ -64,7 +79,7 @@ export default function AdminSubscribersPage() {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-8)' }}>
-                <h1>Newsletter Subscribers ({subscribers.length})</h1>
+                <h1>Newsletter Subscribers</h1>
                 <Button onClick={exportToCSV} variant="outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Download size={16} /> Export CSV
                 </Button>
@@ -116,6 +131,28 @@ export default function AdminSubscribersPage() {
                         )}
                     </tbody>
                 </table>
+                {/* Pagination Controls */}
+                {subscribers.length > 0 && (
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', padding: '1rem', alignItems: 'center', borderTop: '1px solid var(--border-light)' }}>
+                        <Button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Previous
+                        </Button>
+                        <span style={{ color: '#666', fontSize: '0.9rem' }}>Page {page} of {totalPages}</span>
+                        <Button
+                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Next
+                        </Button>
+                    </div>
+                )}
             </div>
         </div>
     );

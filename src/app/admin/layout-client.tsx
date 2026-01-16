@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Package, Users, BarChart, Settings, Home, ShoppingCart, Truck, MessageSquare, LogOut, Tag } from 'lucide-react';
+import { AdminRealtimeNotifier } from '@/components/admin/AdminRealtimeNotifier';
 
 export default function AdminLayout({
     children,
@@ -64,6 +65,7 @@ export default function AdminLayout({
         { href: '/admin/products', label: 'Products', icon: <Package size={20} /> },
         { href: '/admin/categories', label: 'Categories', icon: <Package size={20} /> },
         { href: '/admin/orders', label: 'Orders', icon: <ShoppingCart size={20} /> },
+        { href: '/admin/reviews', label: 'Reviews', icon: <MessageSquare size={20} /> },
         { href: '/admin/coupons', label: 'Coupons', icon: <Settings size={20} /> },
         { href: '/admin/offers', label: 'Offers', icon: <Tag size={20} /> },
         { href: '/admin/shipping', label: 'Shipping', icon: <Truck size={20} /> },
@@ -182,6 +184,7 @@ export default function AdminLayout({
                 padding: 'var(--space-8)',
                 overflow: 'auto'
             }}>
+                <AdminRealtimeNotifier />
                 {children}
             </main>
         </div>
