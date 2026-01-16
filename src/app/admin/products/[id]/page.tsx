@@ -22,7 +22,8 @@ export default function ProductEditPage() {
         size: '',
         is_featured: false,
         season_over: false,
-        original_price: ''
+        original_price: '',
+        imageUrl: ''
     });
 
     useEffect(() => {
@@ -58,7 +59,8 @@ export default function ProductEditPage() {
                     size: data.size || '',
                     is_featured: data.is_featured || false,
                     season_over: data.season_over || false,
-                    original_price: data.original_price?.toString() || ''
+                    original_price: data.original_price?.toString() || '',
+                    imageUrl: data.images?.[0] || ''
                 });
             }
         } catch (error) {
@@ -88,7 +90,8 @@ export default function ProductEditPage() {
                     size: formData.size,
                     is_featured: formData.is_featured,
                     season_over: formData.season_over,
-                    original_price: formData.original_price ? parseFloat(formData.original_price) : null
+                    original_price: formData.original_price ? parseFloat(formData.original_price) : null,
+                    images: formData.imageUrl ? [formData.imageUrl] : []
                 }),
             });
 
@@ -287,6 +290,25 @@ export default function ProductEditPage() {
                                     }}
                                 />
                             </div>
+                        </div>
+
+                        {/* Image URL */}
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                                Image URL
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.imageUrl}
+                                onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                                placeholder="https://example.com/image.jpg"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    border: '1px solid var(--border-light)',
+                                    borderRadius: '0.5rem'
+                                }}
+                            />
                         </div>
 
                         {/* Checkboxes */}

@@ -25,7 +25,8 @@ export async function PATCH(
                 size: body.size,
                 is_featured: body.is_featured,
                 season_over: body.season_over,
-                original_price: body.original_price
+                original_price: body.original_price,
+                images: body.images
             })
             .eq('id', productId)
             .select()
