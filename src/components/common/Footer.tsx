@@ -45,9 +45,30 @@ export const Footer = () => {
                 </div>
 
             </div>
-            <div style={{ textAlign: 'center', marginTop: 'var(--space-12)', paddingTop: 'var(--space-8)', borderTop: '1px solid rgba(0,0,0,0.05)', fontSize: '0.8rem' }}>
-                © {new Date().getFullYear()} Salem Farm Mango. All rights reserved.
-            </div>
+           <div
+  style={{
+    textAlign: "center",
+    marginTop: "var(--space-12)",
+    paddingTop: "var(--space-8)",
+    borderTop: "1px solid rgba(0,0,0,0.05)",
+    fontSize: "0.8rem",
+  }}
+>
+  © {new Date().getFullYear()} Salem Farm Mango. All rights reserved.
+  <br />
+  <strong>
+    Developed by{" "}
+    <a
+      href="https://zouiscorp.in"
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
+      Zouis Corp
+    </a>
+  </strong>
+</div>
+
         </footer>
     );
 };
