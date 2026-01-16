@@ -89,9 +89,9 @@ export default async function Home() {
                 <div className="container">
                     <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>Our Categories</h2>
 
-                    <div className="categories-grid" style={{ display: 'grid', gap: 'var(--space-8)' }}>
+                    <div className="categories-grid">
                         {categories.map((cat, index) => (
-                            <Link href={`/shop?category=${encodeURIComponent(cat.name)}`} key={cat.id} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <Link href={`/shop?category=${encodeURIComponent(cat.name)}`} key={cat.id} className="category-card-wrapper" style={{ textDecoration: 'none', color: 'inherit' }}>
                                 <div className="card-hover" style={{
                                     padding: '2rem',
                                     textAlign: 'center',
@@ -110,18 +110,23 @@ export default async function Home() {
                                     <div style={{
                                         width: '80px',
                                         height: '80px',
-                                        background: `var(--color-mango-${((index % 4) + 1) * 100})`,
+                                        background: cat.image_url ? 'none' : `var(--color-mango-${((index % 4) + 1) * 100})`,
                                         borderRadius: '50%',
                                         marginBottom: '1.5rem',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        fontSize: '2rem'
+                                        fontSize: '2rem',
+                                        overflow: 'hidden'
                                     }}>
-                                        {cat.name.toLowerCase().includes('mango') ? '🥭' :
-                                            cat.name.toLowerCase().includes('spice') ? '🌶️' :
-                                                cat.name.toLowerCase().includes('oil') ? '🥥' :
-                                                    cat.name.toLowerCase().includes('rice') ? '🌾' : '📦'}
+                                        {cat.image_url ? (
+                                            <img src={cat.image_url} alt={cat.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            cat.name.toLowerCase().includes('mango') ? '🥭' :
+                                                cat.name.toLowerCase().includes('spice') ? '🌶️' :
+                                                    cat.name.toLowerCase().includes('oil') ? '🥥' :
+                                                        cat.name.toLowerCase().includes('rice') ? '🌾' : '📦'
+                                        )}
                                     </div>
                                     <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--color-gray-900)' }}>{cat.name}</h3>
                                     <span style={{ color: 'var(--color-mango-600)', fontWeight: '600', fontSize: '0.9rem' }}>

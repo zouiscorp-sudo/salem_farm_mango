@@ -23,8 +23,8 @@ export const Navbar = () => {
     const pathname = usePathname();
     const router = useRouter();
 
-    const [topBarText, setTopBarText] = useState('Grand Opening Offer: Flat 20% OFF on all Mango pre-orders! Use Code: MANGO20');
-    const [isTopBarEnabled, setIsTopBarEnabled] = useState(true);
+    const [topBarText, setTopBarText] = useState('');
+    const [isTopBarEnabled, setIsTopBarEnabled] = useState(false);
 
     useEffect(() => {
         const fetchSettings = async () => {

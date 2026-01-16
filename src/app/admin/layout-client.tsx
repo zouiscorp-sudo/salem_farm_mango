@@ -68,6 +68,7 @@ export default function AdminLayout({
         { href: '/admin/offers', label: 'Offers', icon: <Tag size={20} /> },
         { href: '/admin/shipping', label: 'Shipping', icon: <Truck size={20} /> },
         { href: '/admin/enquiries', label: 'Enquiries', icon: <MessageSquare size={20} /> },
+        { href: '/admin/subscribers', label: 'Subscribers', icon: <Users size={20} /> },
         { href: '/admin/settings', label: 'Settings', icon: <Settings size={20} /> },
     ];
 

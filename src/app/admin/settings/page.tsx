@@ -18,6 +18,12 @@ export default function AdminSettingsPage() {
     const [topBarEnabled, setTopBarEnabled] = useState(true);
     const [topBarSaving, setTopBarSaving] = useState(false);
 
+    const [storePhone, setStorePhone] = useState('');
+    const [storeEmail, setStoreEmail] = useState('');
+    const [storeAddress, setStoreAddress] = useState('');
+    const [storeLocation, setStoreLocation] = useState('');
+    const [contactSaving, setContactSaving] = useState(false);
+
     useEffect(() => {
         verifyAdmin();
         fetchSettings();
@@ -37,6 +43,10 @@ export default function AdminSettingsPage() {
                 if (data.settings.top_bar_enabled !== undefined) {
                     setTopBarEnabled(data.settings.top_bar_enabled === true || data.settings.top_bar_enabled === 'true');
                 }
+                if (data.settings.store_phone) setStorePhone(data.settings.store_phone);
+                if (data.settings.store_email) setStoreEmail(data.settings.store_email);
+                if (data.settings.store_address) setStoreAddress(data.settings.store_address);
+                if (data.settings.store_location) setStoreLocation(data.settings.store_location);
             }
         } catch (err) {
             console.error('Failed to fetch settings', err);
@@ -80,11 +90,36 @@ export default function AdminSettingsPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ key: 'top_bar_content', value: topBarText })
             });
-            // Show success toast or similar? For now just stop loading
         } catch (err) {
             console.error('Failed to update top bar');
         } finally {
             setTopBarSaving(false);
+        }
+    };
+
+    const handleSaveContactInfo = async () => {
+        setContactSaving(true);
+        try {
+            const updates = [
+                { key: 'store_phone', value: storePhone },
+                { key: 'store_email', value: storeEmail },
+                { key: 'store_address', value: storeAddress },
+                { key: 'store_location', value: storeLocation }
+            ];
+
+            for (const update of updates) {
+                await fetch('/api/admin/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(update)
+                });
+            }
+            alert('Contact information updated successfully!');
+        } catch (err) {
+            console.error('Failed to update contact info');
+            alert('Failed to update contact info');
+        } finally {
+            setContactSaving(false);
         }
     };
 
@@ -481,6 +516,81 @@ export default function AdminSettingsPage() {
                 >
                     {topBarSaving ? 'Saving...' : 'Save Changes'}
                 </button>
+            </div>
+
+            {/* Contact Settings Card */}
+            <div style={{
+                background: 'white',
+                padding: '2rem',
+                borderRadius: '0.75rem',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                marginTop: '2rem'
+            }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span style={{ fontSize: '1.5rem' }}>📞</span> Contact Settings
+                </h2>
+
+                <div style={{ display: 'grid', gap: '1.5rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Phone Number</label>
+                        <input
+                            type="text"
+                            value={storePhone}
+                            onChange={(e) => setStorePhone(e.target.value)}
+                            placeholder="+91 99940 50456"
+                            style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--border-light)', borderRadius: '0.5rem' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Email Address</label>
+                        <input
+                            type="email"
+                            value={storeEmail}
+                            onChange={(e) => setStoreEmail(e.target.value)}
+                            placeholder="contact@salemfarmmango.com"
+                            style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--border-light)', borderRadius: '0.5rem' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Farm Address</label>
+                        <textarea
+                            value={storeAddress}
+                            onChange={(e) => setStoreAddress(e.target.value)}
+                            rows={3}
+                            placeholder="New No.1/80, Vattakkadu..."
+                            style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--border-light)', borderRadius: '0.5rem', fontFamily: 'inherit' }}
+                        />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Google Maps Link</label>
+                        <input
+                            type="text"
+                            value={storeLocation}
+                            onChange={(e) => setStoreLocation(e.target.value)}
+                            placeholder="https://maps.app.goo.gl/..."
+                            style={{ width: '100%', padding: '0.75rem', border: '1px solid var(--border-light)', borderRadius: '0.5rem' }}
+                        />
+                    </div>
+                </div>
+
+                <div style={{ marginTop: '1.5rem' }}>
+                    <button
+                        onClick={handleSaveContactInfo}
+                        disabled={contactSaving}
+                        style={{
+                            padding: '0.5rem 1.5rem',
+                            background: contactSaving ? '#9ca3af' : 'var(--color-mango-600)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '0.5rem',
+                            fontSize: '0.95rem',
+                            fontWeight: '600',
+                            cursor: contactSaving ? 'not-allowed' : 'pointer',
+                        }}
+                    >
+                        {contactSaving ? 'Saving...' : 'Save Contact Info'}
+                    </button>
+                </div>
             </div>
         </div>
     );
