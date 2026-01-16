@@ -32,7 +32,7 @@ export const ProductCard = ({ product }: { product: ProductCardProps }) => {
         <div className="product-card product-card-hover">
             {/* Badge */}
             {product.badge && (
-                <span style={{
+                <span className="product-card-badge" style={{
                     position: 'absolute',
                     top: '10px',
                     left: '10px',

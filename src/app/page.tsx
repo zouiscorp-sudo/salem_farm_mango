@@ -73,7 +73,7 @@ export default async function Home() {
             <HeroCarousel />
 
             {/* Featured Products */}
-            <section style={{ padding: 'var(--space-16) var(--space-4)', paddingTop: '100px', paddingBottom: 'var(--space-16)', background: 'var(--color-green-50)' }}>
+            <section className="section-padding" style={{ background: 'var(--color-green-50)' }}>
                 <div className="container">
                     <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>Customer Favorites</h2>
                     <div className="customer-favorites-grid" style={{ display: 'grid', gap: 'var(--space-8)' }}>
@@ -85,7 +85,7 @@ export default async function Home() {
             </section>
 
             {/* Featured Categories - Modern Cards */}
-            <section style={{ padding: '100px var(--space-4) var(--space-16)', borderTop: '1px solid var(--border-light)' }}>
+            <section className="section-padding" style={{ borderTop: '1px solid var(--border-light)' }}>
                 <div className="container">
                     <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>Our Categories</h2>
 
@@ -139,7 +139,7 @@ export default async function Home() {
             </section>
 
             {/* Fresh Arrivals Section */}
-            <section style={{ padding: '100px var(--space-4) var(--space-24)', borderTop: '1px solid var(--border-light)', background: 'white' }}>
+            <section className="section-padding" style={{ borderTop: '1px solid var(--border-light)', background: 'white' }}>
                 <div className="container">
                     <h2 style={{ textAlign: 'center', marginBottom: 'var(--space-12)' }}>Our Fresh Products</h2>
                     <ProductGrid initialProducts={recentProducts} />

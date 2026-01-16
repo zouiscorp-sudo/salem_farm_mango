@@ -91,12 +91,28 @@ export const Navbar = () => {
         <nav style={{ borderBottom: '1px solid var(--border-light)', background: 'white', position: 'sticky', top: 0, zIndex: 50 }}>
             {/* Top Bar */}
             {topBarText && (
-                <div style={{ background: 'var(--color-green-700)', color: 'white', padding: '0.5rem 0', fontSize: '0.875rem', textAlign: 'center' }}>
+                <div style={{
+                    background: 'var(--color-green-700)',
+                    color: 'white',
+                    padding: '0.5rem 0',
+                    fontSize: '0.875rem',
+                    textAlign: 'center',
+                    position: 'relative',
+                    zIndex: 60
+                }}>
                     {topBarText}
                 </div>
             )}
 
-            <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '90px' }}>
+            <div className="container" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                height: '90px',
+                position: 'relative',
+                zIndex: 60,
+                background: 'white'
+            }}>
                 {/* Logo */}
                 <Link href="/">
                     <Image src="/logo.png" alt="Salem Farm Mango" width={140} height={70} style={{ objectFit: 'contain' }} />
@@ -449,43 +465,61 @@ export const Navbar = () => {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div style={{ padding: '1rem', borderTop: '1px solid var(--border-light)', background: 'white' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        {navLinks.map(link => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                onClick={() => setIsMenuOpen(false)}
-                                style={{
-                                    color: isActive(link.href) ? 'var(--color-mango-600)' : 'inherit',
-                                    fontWeight: isActive(link.href) ? '600' : '400',
-                                    textDecoration: 'none',
-                                    display: 'block',
-                                    paddingLeft: isActive(link.href) ? '0.5rem' : '0',
-                                    borderLeft: isActive(link.href) ? '3px solid var(--color-mango-600)' : 'none'
-                                }}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-
-                        {/* Mobile More Menu */}
-                        <div style={{ padding: '0.5rem 0' }}>
-                            <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: 'var(--color-mango-700)' }}>More</div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingLeft: '1rem', borderLeft: '2px solid var(--border-light)' }}>
-                                <Link onClick={() => setIsMenuOpen(false)} href="/offers" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
-                                    Offers <span className="blinking-dot"></span>
+                <>
+                    {/* Backdrop */}
+                    <div
+                        onClick={() => setIsMenuOpen(false)}
+                        style={{
+                            position: 'fixed',
+                            inset: 0,
+                            background: 'rgba(0,0,0,0.4)',
+                            zIndex: 45
+                        }}
+                    />
+                    <div style={{
+                        padding: '1rem',
+                        borderTop: '1px solid var(--border-light)',
+                        background: 'white',
+                        position: 'relative',
+                        zIndex: 50,
+                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+                    }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {navLinks.map(link => (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    style={{
+                                        color: isActive(link.href) ? 'var(--color-mango-600)' : 'inherit',
+                                        fontWeight: isActive(link.href) ? '600' : '400',
+                                        textDecoration: 'none',
+                                        display: 'block',
+                                        paddingLeft: isActive(link.href) ? '0.5rem' : '0',
+                                        borderLeft: isActive(link.href) ? '3px solid var(--color-mango-600)' : 'none'
+                                    }}
+                                >
+                                    {link.label}
                                 </Link>
-                                <Link onClick={() => setIsMenuOpen(false)} href="/more/bulk-enquiry" style={{ textDecoration: 'none', color: 'inherit' }}>Bulk Enquiry</Link>
-                                <Link onClick={() => setIsMenuOpen(false)} href="/more/corporate-gifts" style={{ textDecoration: 'none', color: 'inherit' }}>Corporate Gifts</Link>
-                                <Link onClick={() => setIsMenuOpen(false)} href="/more/share" style={{ textDecoration: 'none', color: 'inherit' }}>Share with Friends</Link>
-                                <Link onClick={() => setIsMenuOpen(false)} href="/faq" style={{ textDecoration: 'none', color: 'inherit' }}>FAQ</Link>
+                            ))}
+
+                            {/* Mobile More Menu */}
+                            <div style={{ padding: '0.5rem 0' }}>
+                                <div style={{ fontWeight: '600', marginBottom: '0.5rem', color: 'var(--color-mango-700)' }}>More</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingLeft: '1rem', borderLeft: '2px solid var(--border-light)' }}>
+                                    <Link onClick={() => setIsMenuOpen(false)} href="/offers" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center' }}>
+                                        Offers <span className="blinking-dot"></span>
+                                    </Link>
+                                    <Link onClick={() => setIsMenuOpen(false)} href="/more/bulk-enquiry" style={{ textDecoration: 'none', color: 'inherit' }}>Bulk Enquiry</Link>
+                                    <Link onClick={() => setIsMenuOpen(false)} href="/more/corporate-gifts" style={{ textDecoration: 'none', color: 'inherit' }}>Corporate Gifts</Link>
+                                    <Link onClick={() => setIsMenuOpen(false)} href="/more/share" style={{ textDecoration: 'none', color: 'inherit' }}>Share with Friends</Link>
+                                    <Link onClick={() => setIsMenuOpen(false)} href="/faq" style={{ textDecoration: 'none', color: 'inherit' }}>FAQ</Link>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )
-            }
+                </>
+            )}
 
             {/* Mobile Search Overlay */}
             {showMobileSearch && (

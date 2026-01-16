@@ -8,7 +8,7 @@ const SLIDES = [
         id: 1,
         image: '/hero-model-eating-mango.png',
         title: 'Premium Salem Mangoes',
-        subtitle: 'Sweet, Juicy & Chemical Free',
+        subtitle: 'Sweet, Juicy & Chemical Free... Naturally Ripened',
         price: 'Starts from ₹149',
         ctaLink: '/shop?category=Mangoes',
         bgColor: '#FEFCE8',
@@ -17,24 +17,24 @@ const SLIDES = [
     },
     {
         id: 2,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Black_rice_cooked.jpg/640px-Black_rice_cooked.jpg',
-        title: 'Best Native Rice, Unpolished',
-        subtitle: 'Direct from farmers... Naturally processed',
-        price: 'Starts from ₹119',
-        ctaLink: '/shop?category=Sugar',
+        image: '/hero-mango-model.png',
+        title: 'Morning Plucked Freshness',
+        subtitle: 'Direct from trees to your doorstep within hours',
+        price: 'Starts from ₹179',
+        ctaLink: '/shop?category=Mangoes',
         bgColor: '#F0F4E3',
-        badge: 'Exclusive Offer',
-        badgeColor: '#ef4444'
+        badge: 'Farm Fresh',
+        badgeColor: '#4d7c0f'
     },
     {
         id: 3,
-        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Coconut_oil_%284497048099%29.jpg/640px-Coconut_oil_%284497048099%29.jpg',
-        title: 'Cold Pressed Purity',
-        subtitle: 'Traditional Wood Pressed Oils',
-        price: 'Starts from ₹239',
-        ctaLink: '/shop?category=Oils',
+        image: '/hero-model.png',
+        title: 'Evening Courier Delivery',
+        subtitle: 'Specialized packaging for safe transit across India',
+        price: 'Starts from ₹199',
+        ctaLink: '/shop?category=Mangoes',
         bgColor: '#ECFDF5',
-        badge: 'Best Seller',
+        badge: 'Fast Shipping',
         badgeColor: '#10b981'
     }
 ];
@@ -153,7 +153,7 @@ export const HeroCarousel = () => {
                                 </div>
 
                                 {/* Image Content (Right) - Fixed to show full product */}
-                                <div style={{
+                                <div className="hidden-mobile" style={{
                                     flex: '0.8',
                                     display: 'flex',
                                     justifyContent: 'center',

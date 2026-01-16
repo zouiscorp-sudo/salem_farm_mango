@@ -96,9 +96,25 @@ h6 {
     padding: 0 var(--space-4);
 }
 
+@media (max-width: 767px) {
+    .container {
+        padding: 0 0.75rem;
+    }
+}
+
 /* Utilities */
 .hidden-mobile {
     display: none !important;
+}
+
+.section-padding {
+    padding: 100px var(--space-4);
+}
+
+@media (max-width: 767px) {
+    .section-padding {
+        padding: 60px 0.25rem;
+    }
 }
 
 @media (min-width: 768px) {
@@ -280,10 +296,9 @@ h6 {
 .shop-product-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    /* Force 2 columns on mobile */
+    /* 2 columns on mobile */
     gap: 0.5rem;
-    /* Tighter gap on mobile */
-    row-gap: 1rem;
+    row-gap: 0.75rem;
 }
 
 @media (min-width: 768px) {
@@ -515,7 +530,58 @@ h6 {
 @media (max-width: 767px) {
     .customer-favorites-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.75rem !important;
+        gap: 0.5rem !important;
+    }
+
+    /* Hide badge on mobile */
+    .product-card-badge {
+        display: none !important;
+    }
+
+    /* Increase image size on mobile */
+    .product-card-image-container {
+        aspect-ratio: 1/1;
+    }
+
+    /* Reduce padding and font sizes on mobile */
+    .product-card-content {
+        padding: 0.35rem;
+        /* Even tighter padding */
+    }
+
+    .product-card-category {
+        font-size: 0.5rem;
+    }
+
+    .product-card-title {
+        font-size: 0.7rem;
+        min-height: 2.2em;
+    }
+
+    .product-card-weight {
+        font-size: 0.6rem;
+    }
+
+    .product-card-rating {
+        gap: 0.1rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .product-card-rating span {
+        font-size: 0.6rem;
+    }
+
+    .product-card-price {
+        font-size: 0.85rem;
+    }
+
+    .product-card-original-price {
+        font-size: 0.65rem;
+    }
+
+    .product-card-btn {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.65rem;
     }
 }
 
@@ -533,18 +599,26 @@ h6 {
 @media (max-width: 767px) {
     .categories-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.75rem !important;
+        gap: 0.5rem !important;
     }
 
     .categories-grid .card-hover {
-        padding: 1.25rem 0.5rem !important;
+        padding: 1rem 0.5rem !important;
     }
 
     .categories-grid .card-hover div[style*="width: 80px"] {
-        width: 60px !important;
-        height: 60px !important;
-        font-size: 1.5rem !important;
-        margin-bottom: 1rem !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1.25rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .categories-grid h3 {
+        font-size: 0.85rem !important;
+    }
+
+    .categories-grid span {
+        font-size: 0.7rem !important;
     }
 }
 
@@ -563,8 +637,8 @@ h6 {
 @media (max-width: 767px) {
     .products-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 0.75rem !important;
-        padding: 0 0.25rem;
+        gap: 0.5rem !important;
+        padding: 0;
     }
 }
 
