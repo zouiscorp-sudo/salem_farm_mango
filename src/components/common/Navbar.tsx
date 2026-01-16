@@ -24,11 +24,17 @@ export const Navbar = () => {
     const router = useRouter();
 
     const [topBarText, setTopBarText] = useState('Grand Opening Offer: Flat 20% OFF on all Mango pre-orders! Use Code: MANGO20');
+    const [isTopBarEnabled, setIsTopBarEnabled] = useState(true);
 
     useEffect(() => {
         const fetchSettings = async () => {
-            const { data } = await supabase.from('store_settings').select('value').eq('key', 'top_bar_content').single();
-            if (data?.value) setTopBarText(data.value);
+            const { data: textData } = await supabase.from('store_settings').select('value').eq('key', 'top_bar_content').single();
+            if (textData?.value) setTopBarText(textData.value);
+
+            const { data: enabledData } = await supabase.from('store_settings').select('value').eq('key', 'top_bar_enabled').single();
+            if (enabledData?.value !== undefined) {
+                setIsTopBarEnabled(enabledData.value === true || enabledData.value === 'true');
+            }
         };
         fetchSettings();
 
@@ -90,7 +96,7 @@ export const Navbar = () => {
     return (
         <nav style={{ borderBottom: '1px solid var(--border-light)', background: 'white', position: 'sticky', top: 0, zIndex: 50 }}>
             {/* Top Bar */}
-            {topBarText && (
+            {isTopBarEnabled && topBarText && (
                 <div style={{
                     background: 'var(--color-green-700)',
                     color: 'white',

@@ -15,6 +15,7 @@ export default function AdminSettingsPage() {
     const [submitting, setSubmitting] = useState(false);
     const [codEnabled, setCodEnabled] = useState(false);
     const [topBarText, setTopBarText] = useState('');
+    const [topBarEnabled, setTopBarEnabled] = useState(true);
     const [topBarSaving, setTopBarSaving] = useState(false);
 
     useEffect(() => {
@@ -32,6 +33,9 @@ export default function AdminSettingsPage() {
                 }
                 if (data.settings.top_bar_content !== undefined) {
                     setTopBarText(data.settings.top_bar_content);
+                }
+                if (data.settings.top_bar_enabled !== undefined) {
+                    setTopBarEnabled(data.settings.top_bar_enabled === true || data.settings.top_bar_enabled === 'true');
                 }
             }
         } catch (err) {
@@ -51,6 +55,20 @@ export default function AdminSettingsPage() {
         } catch (err) {
             console.error('Failed to update settings');
             setCodEnabled(!enabled); // Revert on error
+        }
+    };
+
+    const handleToggleTopBar = async (enabled: boolean) => {
+        setTopBarEnabled(enabled);
+        try {
+            await fetch('/api/admin/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key: 'top_bar_enabled', value: enabled })
+            });
+        } catch (err) {
+            console.error('Failed to update top bar status');
+            setTopBarEnabled(!enabled);
         }
     };
 
@@ -378,6 +396,34 @@ export default function AdminSettingsPage() {
                 <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <span style={{ fontSize: '1.5rem' }}>🎨</span> Appearance Settings
                 </h2>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifySelf: 'stretch', justifyContent: 'space-between', padding: '1rem', border: '1px solid #eee', borderRadius: '0.5rem', marginBottom: '2rem' }}>
+                    <div>
+                        <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Top Bar Announcement</div>
+                        <div style={{ fontSize: '0.9rem', color: '#666' }}>Show or hide the promo bar at the very top</div>
+                    </div>
+
+                    <label style={{ position: 'relative', display: 'inline-block', width: '50px', height: '24px' }}>
+                        <input
+                            type="checkbox"
+                            checked={topBarEnabled}
+                            onChange={(e) => handleToggleTopBar(e.target.checked)}
+                            style={{ opacity: 0, width: 0, height: 0 }}
+                        />
+                        <span style={{
+                            position: 'absolute', cursor: 'pointer', inset: 0,
+                            backgroundColor: topBarEnabled ? '#16a34a' : '#ccc',
+                            borderRadius: '34px',
+                            transition: '0.4s'
+                        }}></span>
+                        <span style={{
+                            position: 'absolute', content: '""', height: '18px', width: '18px',
+                            left: topBarEnabled ? '28px' : '4px', bottom: '3px',
+                            backgroundColor: 'white', borderRadius: '50%',
+                            transition: '0.4s'
+                        }}></span>
+                    </label>
+                </div>
 
                 <div style={{ marginBottom: '1rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
