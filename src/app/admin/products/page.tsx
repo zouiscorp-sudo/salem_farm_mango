@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { supabase } from '@/lib/supabase';
 import { Search, Trash2, Star, CalendarOff, CheckSquare, Square } from 'lucide-react';
+import { MangoLoader } from '@/components/common/MangoLoader';
 
 export default function AdminProductsPage() {
     const router = useRouter();
@@ -142,17 +143,7 @@ export default function AdminProductsPage() {
     const isPageSelected = paginatedProducts.length > 0 && paginatedProducts.every(p => selectedIds.includes(p.id));
 
     if (loading) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-                <div className="animate-spin" style={{
-                    width: '40px',
-                    height: '40px',
-                    border: '4px solid #f3f3f3',
-                    borderTop: '4px solid var(--color-mango-600)',
-                    borderRadius: '50%'
-                }}></div>
-            </div>
-        );
+        return <MangoLoader />;
     }
 
     return (

@@ -1,4 +1,5 @@
 
+import { Metadata } from 'next';
 import React from 'react';
 import { Star } from 'lucide-react';
 import { ReviewSection } from '@/components/product/ReviewSection';
@@ -8,6 +9,44 @@ import { notFound } from 'next/navigation';
 import { ProductCard } from '@/components/common/ProductCard';
 
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+    const productId = params.slug;
+
+    // Fetch minimal product data for SEO
+    const { data: product } = await supabase
+        .from('products')
+        .select('name, description, images')
+        .eq('id', productId)
+        .single();
+
+    if (!product) {
+        return {
+            title: 'Product Not Found | Salem Farm Mango',
+        };
+    }
+
+    const title = `${product.name} | Buy Authentic Salem Mangoes Online`;
+    const description = product.description?.slice(0, 160) || `Buy premium ${product.name} directly from Salem Farm Mango. Organic, fresh, and naturally ripened.`;
+    const image = product.images?.[0] || '/logo.png';
+
+    return {
+        title,
+        description,
+        openGraph: {
+            title,
+            description,
+            images: [{ url: image }],
+            type: 'website',
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [image],
+        }
+    };
+}
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {
     // Determine ID from params (slug is effectively the ID in current linking strategy)
@@ -23,6 +62,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
     if (error || !product) {
         notFound();
     }
+
 
     // Fetch related products (simple logic: same category or just everything else, limited to 4)
     // Ideally filter by category, but for now generic "You might also like"
@@ -101,6 +141,35 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
     return (
         <div className="container" style={{ padding: '2rem 1rem', paddingBottom: '4rem' }}>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        '@context': 'https://schema.org',
+                        '@type': 'Product',
+                        name: product.name,
+                        description: product.description,
+                        image: product.images?.[0] || 'https://salemfarmmango.com/logo.png',
+                        brand: {
+                            '@type': 'Brand',
+                            name: 'Salem Farm Mango'
+                        },
+                        offers: {
+                            '@type': 'Offer',
+                            url: `https://salemfarmmango.com/product/${product.id}`,
+                            priceCurrency: 'INR',
+                            price: product.price,
+                            availability: isOutOfStock ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+                            itemCondition: 'https://schema.org/NewCondition'
+                        },
+                        aggregateRating: avgRating > 0 ? {
+                            '@type': 'AggregateRating',
+                            ratingValue: avgRating,
+                            reviewCount: reviewCount
+                        } : undefined
+                    })
+                }}
+            />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', marginBottom: '4rem' }}>
 
                 {/* Product Images */}

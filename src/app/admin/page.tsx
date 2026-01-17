@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Package, Users, BadgeDollarSign, ShoppingBag } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { MangoLoader } from '@/components/common/MangoLoader';
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -94,17 +95,7 @@ export default function AdminDashboard() {
     };
 
     if (loading) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-                <div className="animate-spin" style={{
-                    width: '40px',
-                    height: '40px',
-                    border: '4px solid #f3f3f3',
-                    borderTop: '4px solid var(--color-mango-600)',
-                    borderRadius: '50%'
-                }}></div>
-            </div>
-        );
+        return <MangoLoader />;
     }
 
     return (

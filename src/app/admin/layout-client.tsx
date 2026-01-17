@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Package, Users, BarChart, Settings, Home, ShoppingCart, Truck, MessageSquare, LogOut, Tag } from 'lucide-react';
 import { AdminRealtimeNotifier } from '@/components/admin/AdminRealtimeNotifier';
+import { MangoLoader } from '@/components/common/MangoLoader';
 
 export default function AdminLayout({
     children,
@@ -43,17 +44,7 @@ export default function AdminLayout({
     };
 
     if (loading) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <div className="animate-spin" style={{
-                    width: '50px',
-                    height: '50px',
-                    border: '5px solid #f3f3f3',
-                    borderTop: '5px solid var(--color-mango-600)',
-                    borderRadius: '50%'
-                }}></div>
-            </div>
-        );
+        return <MangoLoader />;
     }
 
     if (!authenticated) {

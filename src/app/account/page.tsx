@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Package, MapPin, User as UserIcon, LogOut, ChevronRight, Clock, CheckCircle2, Truck, XCircle, Info, Plus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
+import { MangoLoader } from '@/components/common/MangoLoader';
 
 type Tab = 'overview' | 'orders' | 'addresses' | 'profile';
 
@@ -186,11 +187,7 @@ function AccountContent() {
     };
 
     if (loading) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-                <div className="animate-spin" style={{ width: '40px', height: '40px', border: '4px solid #f3f3f3', borderTop: '4px solid var(--color-mango-600)', borderRadius: '50%' }}></div>
-            </div>
-        );
+        return <MangoLoader />;
     }
 
     const menuItems = [
