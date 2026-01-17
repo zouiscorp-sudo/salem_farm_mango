@@ -52,7 +52,7 @@ export const metadata: Metadata = {
         siteName: 'Salem Farm Mango',
         images: [
             {
-                url: '/logo.png',
+                url: '/web.png',
                 width: 1200,
                 height: 630,
                 alt: 'Salem Farm Mango - Premium Organic Mangoes',
